@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MrtOps.Tests/MrtOps.Tests.csproj" Id="49a6d79b-0186-470c-81ec-725dc14e6edc" />
+  <Project Path="MrtOps/MrtOps.csproj" Id="f9cd178b-6b81-4f8c-80b7-0e8f8c30f1c1" />
+</Solution>
