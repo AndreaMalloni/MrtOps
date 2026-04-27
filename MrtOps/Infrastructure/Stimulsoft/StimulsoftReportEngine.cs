@@ -61,4 +61,28 @@ public class StimulsoftReportEngine : IReportEngine
         report.Styles.Load(styleFilePath);
         report.Save(reportPath);
     }
+
+    public void SyncGlobalizationStrings(string reportPath, Dictionary<string, Dictionary<string, string>> localizedStrings)
+    {
+        var report = new StiReport();
+        report.Load(reportPath);
+        report.GlobalizationStrings.Clear();
+
+        foreach (var cultureData in localizedStrings)
+        {
+            var container = new StiGlobalizationContainer(cultureData.Key);
+            foreach (var translation in cultureData.Value)
+            {
+                var globalizationItem = new StiGlobalizationItem
+                {
+                    PropertyName = translation.Key,
+                    Text = translation.Value
+                };
+                container.Items.Add(globalizationItem);
+            }
+            report.GlobalizationStrings.Add(container);
+        }
+
+        report.Save(reportPath);
+    }
 }

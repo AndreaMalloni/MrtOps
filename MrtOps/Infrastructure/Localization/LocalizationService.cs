@@ -47,7 +47,14 @@ public class LocalizationService : ILocalizationService
         { "UndoFail", "[red]No operations to undo in the current session.[/]" },
         { "CreateReportDesc", "Report created at '{0}' using template '{1}'" },
         { "AddVarDesc", "Added variable '{0}' to report '{1}'" },
-        { "ApplyStyleDesc", "Applied style '{0}' to report '{1}'" }
+        { "ApplyStyleDesc", "Applied style '{0}' to report '{1}'" },
+        { "PromptServer", "Server address (es. localhost or .\\SQLEXPRESS):" },
+        { "PromptAuth", "Use Windows Authentication?" },
+        { "PromptUser", "Username:" },
+        { "PromptPass", "Password:" },
+        { "ScanningDatabases", "Scanning databases on server..." },
+        { "DbListHeader", "Available Databases on {0}:" },
+        { "ConnectionStringLabel", "Connection String:" },
     };
 
     private Dictionary<string, string> GetItalianStrings() => new()
@@ -74,6 +81,13 @@ public class LocalizationService : ILocalizationService
         { "UndoFail", "[red]Nessuna operazione da annullare nella sessione corrente.[/]" },
         { "CreateReportDesc", "Creazione report in '{0}' con template '{1}'" },
         { "AddVarDesc", "Aggiunta variabile '{0}' al report '{1}'" },
-        { "ApplyStyleDesc", "Applicato stile '{0}' al report '{1}'" }
+        { "ApplyStyleDesc", "Applicato stile '{0}' al report '{1}'" },
+        { "PromptServer", "Indirizzo server (es. localhost o .\\SQLEXPRESS):" },
+        { "PromptAuth", "Usare Windows Authentication?" },
+        { "PromptUser", "Username:" },
+        { "PromptPass", "Password:" },
+        { "ScanningDatabases", "Scansione dei database sul server in corso..." },
+        { "DbListHeader", "Database disponibili su {0}:" },
+        { "ConnectionStringLabel", "Stringa di Connessione:" },
     };
 }

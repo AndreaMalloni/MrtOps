@@ -42,7 +42,9 @@ public class Program
             {
                 config.AddCommand<GenerateCommand>("gen");
                 config.AddCommand<BatchCommand>("batch");
+                config.AddCommand<DbScanCommand>("db-scan");
                 config.AddCommand<SyncStyleCommand>("sync-style");
+                config.AddCommand<SyncStringsCommand>("sync-strings");
                 config.AddCommand<UndoCommand>("undo");
             });
 
