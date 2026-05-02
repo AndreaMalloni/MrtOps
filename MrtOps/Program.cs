@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MrtOps.Application.Services;
 using MrtOps.Core.History;
 using MrtOps.Core.Interfaces;
@@ -10,7 +7,12 @@ using MrtOps.Infrastructure.Stimulsoft;
 using MrtOps.Infrastructure.Storage;
 using MrtOps.Presentation.CLI.Commands;
 using MrtOps.Presentation.CLI.Infrastructure;
+using MrtOps.Presentation.WPF;
+using MrtOps.Presentation.WPF.ViewModels;
 using Spectre.Console.Cli;
+using System;
+using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace MrtOps;
 
@@ -52,8 +54,15 @@ public class Program
         }
         else
         {
+            services.AddSingleton<MainViewModel>();
+            services.AddSingleton<MainWindow>();
+
+            var serviceProvider = services.BuildServiceProvider();
+
             var wpfApp = new System.Windows.Application();
-            MessageBox.Show("MrtOps UI Mode", "MrtOps");
+            var mainWindow = serviceProvider.GetRequiredService<MainWindow>();
+
+            wpfApp.Run(mainWindow);
             return 0;
         }
     }

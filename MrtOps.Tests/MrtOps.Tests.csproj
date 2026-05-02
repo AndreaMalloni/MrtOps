@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\MrtOps\MrtOps.csproj" />
+	  <ProjectReference Include="..\MrtOps.Core\MrtOps.Core.csproj" />
 	</ItemGroup>
 
 </Project>

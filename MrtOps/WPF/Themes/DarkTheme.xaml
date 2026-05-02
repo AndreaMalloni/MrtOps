@@ -1,0 +1,19 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<SolidColorBrush x:Key="WindowBgBrush" Color="#0F172A"/>
+	<SolidColorBrush x:Key="SidebarBgBrush" Color="#1E293B"/>
+	<SolidColorBrush x:Key="CardBgBrush" Color="#1E293B"/>
+
+	<SolidColorBrush x:Key="PrimaryAccentBrush" Color="#3B82F6"/>
+	<SolidColorBrush x:Key="PrimaryAccentHoverBrush" Color="#60A5FA"/>
+
+	<SolidColorBrush x:Key="TextPrimaryBrush" Color="#F8FAFC"/>
+	<SolidColorBrush x:Key="TextSecondaryBrush" Color="#94A3B8"/>
+
+	<SolidColorBrush x:Key="BorderBrush" Color="#334155"/>
+
+	<SolidColorBrush x:Key="ConsoleBgBrush" Color="#090E17"/>
+	<SolidColorBrush x:Key="ConsoleTextBrush" Color="#4ADE80"/>
+
+	<DropShadowEffect x:Key="ModernShadow" BlurRadius="15" ShadowDepth="1" Opacity="0.25" Color="Black"/>
+</ResourceDictionary>

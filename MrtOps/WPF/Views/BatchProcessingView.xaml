@@ -1,0 +1,67 @@
+<UserControl x:Class="MrtOps.Presentation.WPF.Views.BatchProcessingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer Padding="40" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <TextBlock Text="Batch Processing" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="28" FontWeight="Bold" Margin="0,0,0,25"/>
+
+            <Border Background="{DynamicResource CardBgBrush}" CornerRadius="12" Padding="30" Effect="{StaticResource ModernShadow}">
+                <StackPanel>
+
+                    <TabControl Style="{StaticResource ModernSegmentedControl}" HorizontalAlignment="Stretch" Margin="0,0,0,30">
+                        <TabItem Header="Variables">
+                            <Grid MaxWidth="800" HorizontalAlignment="Left" Margin="0,10,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="Target Folder Path" Style="{StaticResource ModernFontStyle}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+                                    <Grid Margin="0,0,0,20">
+                                        <TextBox Text="C:\Reports\Production\2026" Padding="12,10,40,10"/>
+                                        <Border Width="20" Height="20" BorderBrush="{DynamicResource TextSecondaryBrush}" BorderThickness="1" CornerRadius="2" HorizontalAlignment="Right" Margin="0,0,12,0"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,30">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Variable Name" Style="{StaticResource ModernFontStyle}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+                                            <TextBox Text="REPORT_OUTPUT_DIR"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Category" Style="{StaticResource ModernFontStyle}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,8"/>
+                                            <TextBox Text="Environment"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="0,20,0,0">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="Dry-Run Mode (Simulation)" Style="{StaticResource ModernFontStyle}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                                <TextBlock Text="Preview changes without modifying files" Style="{StaticResource ModernFontStyle}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
+                                            </StackPanel>
+
+                                            <ToggleButton Grid.Column="1" Style="{StaticResource ModernToggleSwitch}" IsChecked="False" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="Styles (.sts)"/>
+                        <TabItem Header="Localized Strings"/>
+                    </TabControl>
+
+                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Execute Batch" HorizontalAlignment="Stretch" MaxWidth="800" Margin="0,10,0,0"/>
+
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
