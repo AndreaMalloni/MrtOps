@@ -1,3 +1,3 @@
-﻿namespace MrtOps.Presentation.WPF.ViewModels;
+﻿namespace MrtOps.WPF.ViewModels;
 
 public class BatchProcessingViewModel : ViewModelBase { }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MrtOps.Core.Interfaces;
 
-namespace MrtOps.Core.History;
+namespace MrtOps.Core;
 
 public class OperationHistoryManager
 {

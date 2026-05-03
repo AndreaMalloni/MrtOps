@@ -4,7 +4,7 @@ using Microsoft.Data.SqlClient;
 using MrtOps.Core.Interfaces;
 using MrtOps.Core.Models;
 
-namespace MrtOps.Infrastructure.Storage;
+namespace MrtOps.Core.Storage;
 
 public class SqlServerDatabaseService : IDatabaseService
 {

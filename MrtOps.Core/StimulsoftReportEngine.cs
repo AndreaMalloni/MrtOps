@@ -4,7 +4,7 @@ using Stimulsoft.Report;
 using Stimulsoft.Report.Dictionary;
 using Stimulsoft.Report.Units;
 
-namespace MrtOps.Infrastructure.Stimulsoft;
+namespace MrtOps.Core;
 
 public class StimulsoftReportEngine : IReportEngine
 {

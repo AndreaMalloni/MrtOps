@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using MrtOps.Core.Interfaces;
 
-namespace MrtOps.Presentation.WPF.ViewModels;
+namespace MrtOps.WPF.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
@@ -79,7 +79,7 @@ public class MainViewModel : ViewModelBase
 
         app.Resources.MergedDictionaries.Clear();
 
-        app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new System.Uri($"/Presentation/WPF/Themes/{(IsDarkMode ? "DarkTheme" : "LightTheme")}.xaml", System.UriKind.Relative) });
-        app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new System.Uri("/Presentation/WPF/Styles/Controls.xaml", System.UriKind.Relative) });
+        app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new System.Uri($"/WPF/Themes/{(IsDarkMode ? "DarkTheme" : "LightTheme")}.xaml", System.UriKind.Relative) });
+        app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new System.Uri("/WPF/Styles/Controls.xaml", System.UriKind.Relative) });
     }
 }

@@ -1,9 +1,9 @@
-﻿using MrtOps.Application.Services;
+﻿using MrtOps.Core;
 using MrtOps.Core.Interfaces;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace MrtOps.Presentation.CLI.Commands;
+namespace MrtOps.CLI.Commands;
 
 public class SyncStringsSettings : CommandSettings
 {

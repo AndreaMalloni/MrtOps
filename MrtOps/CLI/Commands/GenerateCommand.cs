@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel;
-using MrtOps.Core.History;
+using MrtOps.Core;
 using MrtOps.Core.Interfaces;
 using MrtOps.Core.Models;
 using MrtOps.Core.Operations;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace MrtOps.Presentation.CLI.Commands;
+namespace MrtOps.CLI.Commands;
 
 public class GenerateSettings : CommandSettings
 {

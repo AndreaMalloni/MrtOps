@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 
-namespace MrtOps.Presentation.CLI.Infrastructure;
+namespace MrtOps.CLI;
 
 public sealed class TypeRegistrar : ITypeRegistrar
 {

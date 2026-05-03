@@ -1,7 +1,7 @@
 ﻿using System.Windows;
-using MrtOps.Presentation.WPF.ViewModels;
+using MrtOps.WPF.ViewModels;
 
-namespace MrtOps.Presentation.WPF;
+namespace MrtOps.WPF;
 
 public partial class MainWindow : Window
 {

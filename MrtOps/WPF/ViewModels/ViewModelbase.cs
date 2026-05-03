@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace MrtOps.Presentation.WPF.ViewModels;
+namespace MrtOps.WPF.ViewModels;
 
 public abstract class ViewModelBase : INotifyPropertyChanged
 {

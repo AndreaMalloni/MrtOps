@@ -3,7 +3,7 @@ using MrtOps.Core.Interfaces;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace MrtOps.Presentation.CLI.Commands;
+namespace MrtOps.CLI.Commands;
 
 public class DbScanSettings : CommandSettings
 {

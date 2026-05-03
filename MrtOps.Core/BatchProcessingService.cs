@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Text.Json;
-using MrtOps.Core.History;
 using MrtOps.Core.Interfaces;
 using MrtOps.Core.Operations;
 using Spectre.Console;
 
-namespace MrtOps.Application.Services;
+namespace MrtOps.Core;
 
 public class BatchProcessingService
 {

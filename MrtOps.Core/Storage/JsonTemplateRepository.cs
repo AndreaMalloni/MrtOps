@@ -5,7 +5,7 @@ using System.Text.Json;
 using MrtOps.Core.Interfaces;
 using MrtOps.Core.Models;
 
-namespace MrtOps.Infrastructure.Storage;
+namespace MrtOps.Core.Storage;
 
 public class JsonTemplateRepository : ITemplateRepository
 {

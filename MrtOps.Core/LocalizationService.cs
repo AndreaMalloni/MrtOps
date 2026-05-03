@@ -2,7 +2,7 @@
 using System.Globalization;
 using MrtOps.Core.Interfaces;
 
-namespace MrtOps.Infrastructure.Localization;
+namespace MrtOps.Core;
 
 public class LocalizationService : ILocalizationService
 {
