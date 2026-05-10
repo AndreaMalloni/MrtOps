@@ -85,4 +85,42 @@ public class StimulsoftReportEngine : IReportEngine
 
         report.Save(reportPath);
     }
+
+    public bool UpdateReportMetadata(string reportPath, ReportMetadata metadata)
+    {
+        try
+        {
+            var report = new StiReport();
+            report.Load(reportPath);
+
+            report.ReportName = metadata.Name;
+            report.ReportAlias = metadata.Alias;
+            report.ReportDescription = metadata.Description;
+
+            report.Save(reportPath);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Errore in StimulsoftEngineAdapter durante l'aggiornamento dei metadati: {ex.Message}");
+            return false;
+        }
+    }
+
+    public bool CreateEmptyReport(string outputPath)
+    {
+        try
+        {
+            var report = new Stimulsoft.Report.StiReport();
+            report.Save(outputPath);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Errore in Stimulsoft durante la creazione di un report vuoto: {ex.Message}");
+            return false;
+        }
+    }
 }

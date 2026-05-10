@@ -55,6 +55,12 @@ public class LocalizationService : ILocalizationService
         { "ScanningDatabases", "Scanning databases on server..." },
         { "DbListHeader", "Available Databases on {0}:" },
         { "ConnectionStringLabel", "Connection String:" },
+        { "TestGenerateReport", "Report generated successfully" },
+        { "TestAddVariable", "Variable added successfully" },
+        { "TestApplyStyle", "Style applied successfully" },
+        { "TestSyncStrings", "Localized strings synchronized successfully" },
+        { "TestDatabaseConnection", "Database connection verified" },
+        { "TestUndoOperation", "Operation reverted successfully" }
     };
 
     private Dictionary<string, string> GetItalianStrings() => new()
@@ -89,5 +95,11 @@ public class LocalizationService : ILocalizationService
         { "ScanningDatabases", "Scansione dei database sul server in corso..." },
         { "DbListHeader", "Database disponibili su {0}:" },
         { "ConnectionStringLabel", "Stringa di Connessione:" },
+        { "TestGenerateReport", "Report generato con successo" },
+        { "TestAddVariable", "Variabile aggiunta con successo" },
+        { "TestApplyStyle", "Stile applicato con successo" },
+        { "TestSyncStrings", "Stringhe geolocalizzate sincronizzate con successo" },
+        { "TestDatabaseConnection", "Connessione al database verificata" },
+        { "TestUndoOperation", "Operazione annullata con successo" }
     };
 }

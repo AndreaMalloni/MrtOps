@@ -1,5 +1,6 @@
-﻿using System.Windows;
-using MrtOps.Core.Interfaces;
+﻿using MrtOps.Core.Interfaces;
+using MrtOps.WPF.Logging;
+using System.Windows;
 
 namespace MrtOps.WPF.ViewModels;
 
@@ -52,6 +53,14 @@ public class MainViewModel : ViewModelBase
     {
         _loc = loc;
         _currentViewModel = new BatchProcessingViewModel();
+
+        UiConsoleSink.OnLogReceived += (logMessage) =>
+        {
+            Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                ConsoleOutput += logMessage;
+            });
+        };
 
         ToggleThemeCommand = new RelayCommand(_ => IsDarkMode = !IsDarkMode);
         NavigateCommand = new RelayCommand(ExecuteNavigate);

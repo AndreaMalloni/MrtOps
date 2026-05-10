@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Microsoft.Extensions.Logging;
 using MrtOps.Core;
 using MrtOps.Core.Interfaces;
 using MrtOps.Core.Models;
@@ -26,11 +27,13 @@ public class GenerateCommand : Command<GenerateSettings>
     private readonly ITemplateRepository _templates;
     private readonly OperationHistoryManager _history;
     private readonly ILocalizationService _loc;
+    private readonly ILogger<CreateReportOperation> _logger;
 
-    public GenerateCommand(IReportEngine engine, ITemplateRepository templates, OperationHistoryManager history, ILocalizationService loc)
+    public GenerateCommand(IReportEngine engine, ITemplateRepository templates, OperationHistoryManager history, ILocalizationService loc, ILoggerFactory loggerFactory)
     {
         _engine = engine;
         _templates = templates;
+        _logger = loggerFactory.CreateLogger<CreateReportOperation>();
         _history = history;
         _loc = loc;
     }
@@ -39,19 +42,13 @@ public class GenerateCommand : Command<GenerateSettings>
     {
         AnsiConsole.Write(new FigletText("MrtOps").Color(Color.Blue));
 
-        var path = settings.Path ?? AnsiConsole.Ask<string>(_loc.GetString("PromptPath"));
-        var name = settings.Name ?? AnsiConsole.Ask<string>(_loc.GetString("PromptName"));
-        var templateName = settings.Template ?? AnsiConsole.Ask<string>(_loc.GetString("PromptTemplate"), "Standard_Template");
-
-        var template = _templates.GetTemplate(templateName);
-        if (template == null)
-        {
-            AnsiConsole.MarkupLine(_loc.GetString("ErrorTemplateNotFound", templateName));
-            return -1;
-        }
+        var path = settings.Path ?? ".//";
+        var name = settings.Name ?? "Report";
+        var templateName = settings.Template ?? "";
 
         var metadata = new ReportMetadata(name, name, string.Empty, path, templateName);
-        var operation = new CreateReportOperation(_engine, _loc, metadata, template);
+
+        var operation = new CreateReportOperation(_engine, _loc, _templates, metadata, _logger);
 
         _history.Execute(operation);
 

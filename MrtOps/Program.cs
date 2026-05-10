@@ -1,11 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MrtOps.CLI;
+using MrtOps.CLI.Commands;
 using MrtOps.Core;
 using MrtOps.Core.Interfaces;
 using MrtOps.Core.Storage;
-using MrtOps.CLI.Commands;
 using MrtOps.WPF;
+using MrtOps.WPF.Logging;
 using MrtOps.WPF.ViewModels;
+using Serilog;
+using Serilog.Events;
 using Spectre.Console.Cli;
 using System;
 using System.Runtime.InteropServices;
@@ -22,45 +25,77 @@ public class Program
     [STAThread]
     public static int Main(string[] args)
     {
-        var services = new ServiceCollection();
+        bool isCliMode = args.Length > 0;
 
-        services.AddSingleton<ILocalizationService, LocalizationService>();
-        services.AddSingleton<OperationHistoryManager>();
-        services.AddSingleton<ITemplateRepository, JsonTemplateRepository>();
-        services.AddSingleton<IReportEngine, StimulsoftReportEngine>();
-        services.AddSingleton<BatchProcessingService>();
+        var loggerConfig = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Logger(l => l.Filter.ByIncludingOnly(e => e.Level <= LogEventLevel.Information)
+                                  .WriteTo.File("logs/mrtops-info-.txt", rollingInterval: RollingInterval.Day))
+            .WriteTo.Logger(l => l.Filter.ByIncludingOnly(e => e.Level == LogEventLevel.Warning)
+                                  .WriteTo.File("logs/mrtops-warnings-.txt", rollingInterval: RollingInterval.Day))
+            .WriteTo.Logger(l => l.Filter.ByIncludingOnly(e => e.Level >= LogEventLevel.Error)
+                                  .WriteTo.File("logs/mrtops-errors-.txt", rollingInterval: RollingInterval.Day));
 
-        if (args.Length > 0)
-        {
-            AttachConsole(AttachParentProcess);
-
-            var registrar = new TypeRegistrar(services);
-            var app = new CommandApp(registrar);
-
-            app.Configure(config =>
-            {
-                config.AddCommand<GenerateCommand>("gen");
-                config.AddCommand<BatchCommand>("batch");
-                config.AddCommand<DbScanCommand>("db-scan");
-                config.AddCommand<SyncStyleCommand>("sync-style");
-                config.AddCommand<SyncStringsCommand>("sync-strings");
-                config.AddCommand<UndoCommand>("undo");
-            });
-
-            return app.Run(args);
-        }
+        if (isCliMode)
+            loggerConfig.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}");
         else
+            loggerConfig.WriteTo.Logger(l => l.Filter.ByIncludingOnly(e => e.Level >= LogEventLevel.Information)
+                                              .WriteTo.Sink(new UiConsoleSink()));
+
+        Log.Logger = loggerConfig.CreateLogger();
+
+        try
         {
-            services.AddSingleton<MainViewModel>();
-            services.AddSingleton<MainWindow>();
+            var services = new ServiceCollection();
 
-            var serviceProvider = services.BuildServiceProvider();
+            services.AddLogging(builder => builder.AddSerilog(dispose: true));
+            services.AddSingleton<ILocalizationService, LocalizationService>();
+            services.AddSingleton<OperationHistoryManager>();
+            services.AddSingleton<ITemplateRepository, FileTemplateRepository>();
+            services.AddSingleton<IReportEngine, StimulsoftReportEngine>();
+            services.AddSingleton<BatchProcessingService>();
 
-            var wpfApp = new System.Windows.Application();
-            var mainWindow = serviceProvider.GetRequiredService<MainWindow>();
+            if (isCliMode)
+            {
+                AttachConsole(AttachParentProcess);
 
-            wpfApp.Run(mainWindow);
-            return 0;
+                var registrar = new TypeRegistrar(services);
+                var app = new CommandApp(registrar);
+
+                app.Configure(config =>
+                {
+                    config.AddCommand<GenerateCommand>("gen");
+                    config.AddCommand<BatchCommand>("batch");
+                    config.AddCommand<DbScanCommand>("db-scan");
+                    config.AddCommand<SyncStyleCommand>("sync-style");
+                    config.AddCommand<SyncStringsCommand>("sync-strings");
+                    config.AddCommand<UndoCommand>("undo");
+                });
+
+                return app.Run(args);
+            }
+            else
+            {
+                services.AddSingleton<MainViewModel>();
+                services.AddSingleton<MainWindow>();
+
+                var serviceProvider = services.BuildServiceProvider();
+
+                var wpfApp = new System.Windows.Application();
+                var mainWindow = serviceProvider.GetRequiredService<MainWindow>();
+
+                wpfApp.Run(mainWindow);
+                return 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Errore fatale imprevisto che ha causato il crash dell'applicazione.");
+            return 1;
+        }
+        finally
+        {
+            Log.CloseAndFlush();
         }
     }
 }

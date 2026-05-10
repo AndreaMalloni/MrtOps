@@ -8,4 +8,6 @@ public interface IReportEngine
     void AddVariableToReport(string filePath, string category, string variableName);
     void ApplyStyleToReport(string reportPath, string styleFilePath);
     void SyncGlobalizationStrings(string reportPath, Dictionary<string, Dictionary<string, string>> localizedStrings);
+    bool UpdateReportMetadata(string reportPath, ReportMetadata metadata);
+    bool CreateEmptyReport(string outputPath);
 }

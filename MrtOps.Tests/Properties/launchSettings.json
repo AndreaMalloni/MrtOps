@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Test (Console)": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "test --logger \"console;verbosity=normal\"",
+      "workingDirectory": "$(ProjectDir)"
+    }
+  }
+}
