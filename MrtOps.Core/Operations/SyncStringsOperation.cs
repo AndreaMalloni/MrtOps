@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using MrtOps.Core.Interfaces;
 
 namespace MrtOps.Core.Operations;
 
-public class SyncStringsOperation : IOperation
+public class SyncStringsOperation : IReversibleOperation
 {
     private readonly IReportEngine _engine;
     private readonly ILocalizationService _loc;
@@ -13,6 +13,9 @@ public class SyncStringsOperation : IOperation
     private readonly string _backupPath;
 
     public string Description => _loc.GetString("SyncStringsDesc", Path.GetFileName(_reportPath));
+    public string OperationType => "SyncStrings";
+    public string TargetFilePath => _reportPath;
+    public string? BackupFilePath => _backupPath;
 
     public SyncStringsOperation(IReportEngine engine, ILocalizationService loc, string reportPath, Dictionary<string, Dictionary<string, string>> localizedStrings)
     {

@@ -1,9 +1,9 @@
-﻿using System.IO;
+using System.IO;
 using MrtOps.Core.Interfaces;
 
 namespace MrtOps.Core.Operations;
 
-public class ApplyStyleOperation : IOperation
+public class ApplyStyleOperation : IReversibleOperation
 {
     private readonly IReportEngine _engine;
     private readonly ILocalizationService _loc;
@@ -12,6 +12,9 @@ public class ApplyStyleOperation : IOperation
     private readonly string _backupPath;
 
     public string Description => _loc.GetString("ApplyStyleDesc", Path.GetFileName(_stylePath), Path.GetFileName(_reportPath));
+    public string OperationType => "ApplyStyle";
+    public string TargetFilePath => _reportPath;
+    public string? BackupFilePath => _backupPath;
 
     public ApplyStyleOperation(IReportEngine engine, ILocalizationService loc, string reportPath, string stylePath)
     {

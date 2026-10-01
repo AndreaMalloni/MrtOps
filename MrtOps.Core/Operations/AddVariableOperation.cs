@@ -1,9 +1,9 @@
-﻿using System.IO;
+using System.IO;
 using MrtOps.Core.Interfaces;
 
 namespace MrtOps.Core.Operations;
 
-public class AddVariableOperation : IOperation
+public class AddVariableOperation : IReversibleOperation
 {
     private readonly IReportEngine _engine;
     private readonly ILocalizationService _loc;
@@ -13,6 +13,9 @@ public class AddVariableOperation : IOperation
     private readonly string _backupPath;
 
     public string Description => _loc.GetString("AddVarDesc", _variableName, Path.GetFileName(_filePath));
+    public string OperationType => "AddVariable";
+    public string TargetFilePath => _filePath;
+    public string? BackupFilePath => _backupPath;
 
     public AddVariableOperation(IReportEngine engine, ILocalizationService loc, string filePath, string category, string variableName)
     {

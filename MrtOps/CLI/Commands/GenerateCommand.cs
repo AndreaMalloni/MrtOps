@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using MrtOps.Core;
 using MrtOps.Core.Interfaces;
@@ -42,17 +42,20 @@ public class GenerateCommand : Command<GenerateSettings>
     {
         AnsiConsole.Write(new FigletText("MrtOps").Color(Color.Blue));
 
-        var path = settings.Path ?? ".//";
-        var name = settings.Name ?? "Report";
-        var templateName = settings.Template ?? "";
+        var (resolvedPath, effectiveName) = ReportPathResolver.Resolve(settings.Path, settings.Name);
+        var templateName = settings.Template ?? string.Empty;
 
-        var metadata = new ReportMetadata(name, name, string.Empty, path, templateName);
+        var metadata = new ReportMetadata(effectiveName, effectiveName, string.Empty, resolvedPath, templateName);
 
         var operation = new CreateReportOperation(_engine, _loc, _templates, metadata, _logger);
 
-        _history.Execute(operation);
+        if (_history.Execute(operation))
+        {
+            AnsiConsole.MarkupLine(_loc.GetString("SuccessReport", resolvedPath));
+            return 0;
+        }
 
-        AnsiConsole.MarkupLine(_loc.GetString("SuccessReport", path));
-        return 0;
+        AnsiConsole.MarkupLine(_loc.GetString("ErrorGenerateReport", resolvedPath));
+        return 1;
     }
 }

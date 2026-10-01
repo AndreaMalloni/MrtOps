@@ -1,13 +1,12 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using MrtOps.Core.Interfaces;
 using MrtOps.Core.Models;
 
 namespace MrtOps.Core.Operations;
 
-public class CreateReportOperation : IOperation
+public class CreateReportOperation : IReversibleOperation
 {
     private readonly IReportEngine _engine;
     private readonly ILocalizationService _loc;
@@ -16,6 +15,9 @@ public class CreateReportOperation : IOperation
     private readonly ILogger<CreateReportOperation> _logger;
 
     public string Description => _loc.GetString("OpCreateReport", _metadata.Name, _metadata.TemplateName);
+    public string OperationType => "CreateReport";
+    public string TargetFilePath => _metadata.OutputPath;
+    public string? BackupFilePath => null;
 
     public CreateReportOperation(
         IReportEngine engine,
@@ -35,7 +37,7 @@ public class CreateReportOperation : IOperation
     {
         try
         {
-            string destDir = Path.GetDirectoryName(_metadata.OutputPath);
+            string? destDir = Path.GetDirectoryName(_metadata.OutputPath);
 
             if (!string.IsNullOrEmpty(destDir) && !Directory.Exists(destDir))
             {
@@ -45,7 +47,17 @@ public class CreateReportOperation : IOperation
 
             if (!string.IsNullOrEmpty(_metadata.TemplateName))
             {
-                string templatePath = _templateRepo.GetTemplateFilePath(_metadata.TemplateName);
+                string templatePath;
+                try
+                {
+                    templatePath = _templateRepo.GetTemplateFilePath(_metadata.TemplateName);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Template '{TemplateName}' non trovato.", _metadata.TemplateName);
+                    return false;
+                }
+
                 _logger.LogInformation("Creazione report '{ReportName}' dal template '{TemplateName}' in '{OutputPath}'",
                     _metadata.Name, _metadata.TemplateName, _metadata.OutputPath);
 
@@ -56,10 +68,18 @@ public class CreateReportOperation : IOperation
                 _logger.LogInformation("Nessun template specificato. Creazione report vuoto '{ReportName}' in '{OutputPath}'",
                     _metadata.Name, _metadata.OutputPath);
 
-                _engine.CreateEmptyReport(_metadata.OutputPath);
+                if (!_engine.CreateEmptyReport(_metadata.OutputPath))
+                {
+                    _logger.LogError("Fallita creazione report vuoto in '{OutputPath}'.", _metadata.OutputPath);
+                    return false;
+                }
             }
 
-            _engine.UpdateReportMetadata(_metadata.OutputPath, _metadata);
+            if (!_engine.UpdateReportMetadata(_metadata.OutputPath, _metadata))
+            {
+                _logger.LogError("Fallito aggiornamento metadati report in '{OutputPath}'.", _metadata.OutputPath);
+                return false;
+            }
 
             return true;
         }
@@ -81,8 +101,9 @@ public class CreateReportOperation : IOperation
             }
             return false;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Errore durante il rollback del report '{OutputPath}'.", _metadata.OutputPath);
             return false;
         }
     }

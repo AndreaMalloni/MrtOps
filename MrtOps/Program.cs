@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using MrtOps.CLI;
 using MrtOps.CLI.Commands;
 using MrtOps.Core;
@@ -50,6 +50,7 @@ public class Program
 
             services.AddLogging(builder => builder.AddSerilog(dispose: true));
             services.AddSingleton<ILocalizationService, LocalizationService>();
+            services.AddSingleton<IHistoryStorage, JsonHistoryStorage>();
             services.AddSingleton<OperationHistoryManager>();
             services.AddSingleton<ITemplateRepository, FileTemplateRepository>();
             services.AddSingleton<IReportEngine, StimulsoftReportEngine>();

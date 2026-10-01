@@ -1,4 +1,8 @@
-﻿using MrtOps.Core.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.Extensions.Logging;
+using MrtOps.Core.Interfaces;
 using MrtOps.Core.Models;
 using Stimulsoft.Report;
 using Stimulsoft.Report.Dictionary;
@@ -8,16 +12,25 @@ namespace MrtOps.Core;
 
 public class StimulsoftReportEngine : IReportEngine
 {
+    private readonly ILogger<StimulsoftReportEngine>? _logger;
+
+    public StimulsoftReportEngine(ILogger<StimulsoftReportEngine>? logger = null)
+    {
+        _logger = logger;
+    }
+
     public void GenerateReport(ReportMetadata metadata, ReportTemplateDef template)
     {
-        var report = new StiReport();
-        report.ReportName = metadata.Name;
-        report.ReportAlias = metadata.Alias;
-        report.ReportDescription = metadata.Description;
-        report.ReportAuthor = template.Author;
-        report.ConvertNulls = template.ConvertNulls;
-        report.Culture = "it-IT";
-        report.Unit = new StiCentimetersUnit();
+        var report = new StiReport
+        {
+            ReportName = metadata.Name,
+            ReportAlias = metadata.Alias,
+            ReportDescription = metadata.Description,
+            ReportAuthor = template.Author,
+            ConvertNulls = template.ConvertNulls,
+            Culture = "it-IT",
+            Unit = new StiCentimetersUnit()
+        };
 
         report.Dictionary.Synchronize();
 
@@ -90,6 +103,12 @@ public class StimulsoftReportEngine : IReportEngine
     {
         try
         {
+            if (!File.Exists(reportPath))
+            {
+                _logger?.LogError("Impossibile aggiornare i metadati: il file '{ReportPath}' non esiste.", reportPath);
+                return false;
+            }
+
             var report = new StiReport();
             report.Load(reportPath);
 
@@ -98,12 +117,11 @@ public class StimulsoftReportEngine : IReportEngine
             report.ReportDescription = metadata.Description;
 
             report.Save(reportPath);
-
             return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Errore in StimulsoftEngineAdapter durante l'aggiornamento dei metadati: {ex.Message}");
+            _logger?.LogError(ex, "Errore durante l'aggiornamento dei metadati per '{ReportPath}'.", reportPath);
             return false;
         }
     }
@@ -112,14 +130,29 @@ public class StimulsoftReportEngine : IReportEngine
     {
         try
         {
-            var report = new Stimulsoft.Report.StiReport();
-            report.Save(outputPath);
+            if (string.IsNullOrWhiteSpace(outputPath) || Directory.Exists(outputPath))
+            {
+                _logger?.LogError("Il percorso specificato '{OutputPath}' non è un percorso di file valido.", outputPath);
+                return false;
+            }
 
+            string? dir = Path.GetDirectoryName(outputPath);
+            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            var report = new StiReport
+            {
+                Culture = "it-IT",
+                Unit = new StiCentimetersUnit()
+            };
+            report.Save(outputPath);
             return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Errore in Stimulsoft durante la creazione di un report vuoto: {ex.Message}");
+            _logger?.LogError(ex, "Errore in Stimulsoft durante la creazione di un report vuoto in '{OutputPath}'.", outputPath);
             return false;
         }
     }
