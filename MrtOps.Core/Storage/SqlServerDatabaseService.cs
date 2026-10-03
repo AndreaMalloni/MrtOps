@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using MrtOps.Core.Interfaces;
@@ -6,8 +6,19 @@ using MrtOps.Core.Models;
 
 namespace MrtOps.Core.Storage;
 
+/// <summary>
+/// Provides services for interacting with a SQL Server database.
+/// </summary>
 public class SqlServerDatabaseService : IDatabaseService
 {
+    /// <summary>
+    /// Gets a list of available databases on the specified server.
+    /// </summary>
+    /// <param name="serverAddress">The SQL server address.</param>
+    /// <param name="useWindowsAuthentication">Indicates whether to use Windows authentication.</param>
+    /// <param name="username">The optional username for SQL authentication.</param>
+    /// <param name="password">The optional password for SQL authentication.</param>
+    /// <returns>A list of information about available databases.</returns>
     public async Task<List<DatabaseInfo>> GetAvailableDatabasesAsync(string serverAddress, bool useWindowsAuthentication, string? username = null, string? password = null)
     {
         var databases = new List<DatabaseInfo>();

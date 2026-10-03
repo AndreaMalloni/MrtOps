@@ -363,3 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .agents/
+# DocFX
+_site/
+api/*.yml
+api/.manifest
