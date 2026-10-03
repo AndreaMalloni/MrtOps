@@ -5,17 +5,14 @@ using MrtOps.Core.Models;
 namespace MrtOps.Core.Interfaces;
 
 /// <summary>
-/// Interface for the database management service.
+/// Provides methods to interact with various database management systems.
 /// </summary>
 public interface IDatabaseService
 {
     /// <summary>
-    /// Gets the list of available databases.
+    /// Connects to a server and retrieves a list of available databases.
     /// </summary>
-    /// <param name="serverAddress">The server address.</param>
-    /// <param name="useWindowsAuthentication">Indicates whether to use Windows authentication.</param>
-    /// <param name="username">The username (optional).</param>
-    /// <param name="password">The password (optional).</param>
-    /// <returns>A list of information about available databases.</returns>
-    Task<List<DatabaseInfo>> GetAvailableDatabasesAsync(string serverAddress, bool useWindowsAuthentication, string? username = null, string? password = null);
+    /// <param name="serverConfig">The server configuration.</param>
+    /// <returns>A list of database information objects.</returns>
+    Task<List<DatabaseInfo>> GetAvailableDatabasesAsync(ServerConfiguration serverConfig);
 }
