@@ -16,6 +16,9 @@ using System.Windows;
 
 namespace MrtOps;
 
+/// <summary>
+/// The main entry point for the application.
+/// </summary>
 public class Program
 {
     [DllImport("kernel32.dll", SetLastError = true)]
@@ -55,10 +58,17 @@ public class Program
             services.AddSingleton<ITemplateRepository, FileTemplateRepository>();
             services.AddSingleton<IReportEngine, StimulsoftReportEngine>();
             services.AddSingleton<BatchProcessingService>();
+            services.AddSingleton<IServerConfigurationService, ServerConfigurationService>();
+            services.AddSingleton<IDatabaseService, MultiDatabaseService>();
 
             if (isCliMode)
             {
                 AttachConsole(AttachParentProcess);
+
+                // Fix for WinExe: AttachConsole does not automatically update Console.In
+                // We must manually reinitialize the standard input stream so Spectre.Console can read interactively
+                var stdIn = new System.IO.StreamReader(Console.OpenStandardInput(), Console.InputEncoding);
+                Console.SetIn(stdIn);
 
                 var registrar = new TypeRegistrar(services);
                 var app = new CommandApp(registrar);
@@ -71,6 +81,16 @@ public class Program
                     config.AddCommand<SyncStyleCommand>("sync-style");
                     config.AddCommand<SyncStringsCommand>("sync-strings");
                     config.AddCommand<UndoCommand>("undo");
+
+                    config.AddBranch("server", server =>
+                    {
+                        server.AddCommand<ServerAddCommand>("add");
+                        server.AddCommand<ServerUpdateCommand>("edit");
+                        server.AddCommand<ServerListCommand>("list");
+                        server.AddCommand<ServerRemoveCommand>("remove");
+                        server.AddCommand<ServerExportCommand>("export");
+                        server.AddCommand<ServerImportCommand>("import");
+                    });
                 });
 
                 return app.Run(args);
@@ -91,7 +111,7 @@ public class Program
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Errore fatale imprevisto che ha causato il crash dell'applicazione.");
+            Log.Fatal(ex, "An unexpected fatal error occurred, causing the application to crash.");
             return 1;
         }
         finally
