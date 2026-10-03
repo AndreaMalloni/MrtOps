@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text.Json;
 using MrtOps.Core.Interfaces;
 using MrtOps.Core.Operations;
@@ -6,12 +6,21 @@ using Spectre.Console;
 
 namespace MrtOps.Core;
 
+/// <summary>
+/// Service for batch processing operations on report files within folders.
+/// </summary>
 public class BatchProcessingService
 {
     private readonly OperationHistoryManager _history;
     private readonly IReportEngine _engine;
     private readonly ILocalizationService _loc;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="BatchProcessingService"/>.
+    /// </summary>
+    /// <param name="history">Operation history manager.</param>
+    /// <param name="engine">Engine for processing reports.</param>
+    /// <param name="loc">Localization service.</param>
     public BatchProcessingService(OperationHistoryManager history, IReportEngine engine, ILocalizationService loc)
     {
         _history = history;
@@ -19,6 +28,13 @@ public class BatchProcessingService
         _loc = loc;
     }
 
+    /// <summary>
+    /// Processes files in a folder by adding a specified variable.
+    /// </summary>
+    /// <param name="folderPath">The path of the folder containing the files to process.</param>
+    /// <param name="category">The category of the variable to add.</param>
+    /// <param name="variableName">The name of the variable to add.</param>
+    /// <param name="dryRun">If <c>true</c>, simulates the operation without making actual modifications to the files.</param>
     public void ProcessFolderAddVariable(string folderPath, string category, string variableName, bool dryRun)
     {
         if (!Directory.Exists(folderPath))
@@ -55,6 +71,12 @@ public class BatchProcessingService
         AnsiConsole.MarkupLine(_loc.GetString("SuccessProcess"));
     }
 
+    /// <summary>
+    /// Processes files in a folder by applying a specified style.
+    /// </summary>
+    /// <param name="folderPath">The path of the folder containing the files to process.</param>
+    /// <param name="styleFilePath">The path to the style file to apply.</param>
+    /// <param name="dryRun">If <c>true</c>, simulates the operation without making actual modifications to the files.</param>
     public void ProcessFolderApplyStyle(string folderPath, string styleFilePath, bool dryRun)
     {
         if (!Directory.Exists(folderPath))
@@ -97,6 +119,12 @@ public class BatchProcessingService
         AnsiConsole.MarkupLine(_loc.GetString("SuccessProcess"));
     }
 
+    /// <summary>
+    /// Processes files in a folder by synchronizing localization strings.
+    /// </summary>
+    /// <param name="folderPath">The path of the folder containing the files to process.</param>
+    /// <param name="stringsFilePath">The path of the JSON file containing the localization strings.</param>
+    /// <param name="dryRun">If <c>true</c>, simulates the operation without making actual modifications to the files.</param>
     public void ProcessFolderSyncStrings(string folderPath, string stringsFilePath, bool dryRun)
     {
         if (!Directory.Exists(folderPath))

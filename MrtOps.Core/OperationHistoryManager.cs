@@ -8,6 +8,13 @@ using MrtOps.Core.Storage;
 
 namespace MrtOps.Core;
 
+/// <summary>
+/// Represents a preview of an operation that can be executed or undone.
+/// </summary>
+/// <param name="Description">Description of the operation.</param>
+/// <param name="TargetFilePath">Path of the target file.</param>
+/// <param name="BackupFilePath">Path of the backup file, if any.</param>
+/// <param name="IsCreation">Indicates if the operation is a creation.</param>
 public record OperationPreview(
     string Description,
     string TargetFilePath,
@@ -15,16 +22,28 @@ public record OperationPreview(
     bool IsCreation
 );
 
+/// <summary>
+/// Operation history manager, allows executing and undoing operations.
+/// </summary>
 public class OperationHistoryManager
 {
     private readonly Stack<IOperation> _history = new();
     private readonly IHistoryStorage _storage;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="OperationHistoryManager"/>.
+    /// </summary>
+    /// <param name="storage">Optional storage for the history.</param>
     public OperationHistoryManager(IHistoryStorage? storage = null)
     {
         _storage = storage ?? new JsonHistoryStorage();
     }
 
+    /// <summary>
+    /// Executes an operation and adds it to the history.
+    /// </summary>
+    /// <param name="operation">The operation to execute.</param>
+    /// <returns><c>true</c> if the operation was successful, <c>false</c> otherwise.</returns>
     public bool Execute(IOperation operation)
     {
         if (operation.Execute())
@@ -49,6 +68,11 @@ public class OperationHistoryManager
         return false;
     }
 
+    /// <summary>
+    /// Attempts to preview the last performed operation.
+    /// </summary>
+    /// <param name="preview">The result of the operation preview.</param>
+    /// <returns><c>true</c> if there is an operation in the history, <c>false</c> otherwise.</returns>
     public bool TryPeekLast(out OperationPreview? preview)
     {
         preview = null;
@@ -88,6 +112,11 @@ public class OperationHistoryManager
         return false;
     }
 
+    /// <summary>
+    /// Undoes the last performed operation.
+    /// </summary>
+    /// <param name="description">Description of the undone operation.</param>
+    /// <returns><c>true</c> if the undo was successful, <c>false</c> otherwise.</returns>
     public bool UndoLast(out string description)
     {
         description = string.Empty;

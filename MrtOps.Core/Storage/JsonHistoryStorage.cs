@@ -7,11 +7,18 @@ using MrtOps.Core.Models;
 
 namespace MrtOps.Core.Storage;
 
+/// <summary>
+/// Provides a JSON file-based history storage mechanism.
+/// </summary>
 public class JsonHistoryStorage : IHistoryStorage
 {
     private readonly string _storagePath;
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JsonHistoryStorage"/> class.
+    /// </summary>
+    /// <param name="storagePath">The optional storage file path.</param>
     public JsonHistoryStorage(string? storagePath = null)
     {
         _storagePath = storagePath 
@@ -19,6 +26,10 @@ public class JsonHistoryStorage : IHistoryStorage
                        ?? Path.Combine(Environment.CurrentDirectory, ".mrtops_history.json");
     }
 
+    /// <summary>
+    /// Saves the specified history entries to the JSON file.
+    /// </summary>
+    /// <param name="entries">The history entries to save.</param>
     public void Save(IReadOnlyList<HistoryEntry> entries)
     {
         try
@@ -38,6 +49,10 @@ public class JsonHistoryStorage : IHistoryStorage
         }
     }
 
+    /// <summary>
+    /// Loads the history entries from the JSON file.
+    /// </summary>
+    /// <returns>The list of loaded history entries.</returns>
     public List<HistoryEntry> Load()
     {
         try
@@ -55,6 +70,9 @@ public class JsonHistoryStorage : IHistoryStorage
         }
     }
 
+    /// <summary>
+    /// Clears the history by deleting the JSON file.
+    /// </summary>
     public void Clear()
     {
         try

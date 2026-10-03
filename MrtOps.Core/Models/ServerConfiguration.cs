@@ -5,9 +5,13 @@ namespace MrtOps.Core.Models;
 /// </summary>
 public enum DatabaseType
 {
+    /// <summary>Microsoft SQL Server.</summary>
     SqlServer,
+    /// <summary>MySQL Server.</summary>
     MySql,
+    /// <summary>PostgreSQL Server.</summary>
     PostgreSql,
+    /// <summary>MariaDB Server.</summary>
     MariaDb
 }
 
