@@ -28,22 +28,36 @@ public class BatchProcessingService
         _loc = loc;
     }
 
-    /// <summary>
-    /// Processes files in a folder by adding a specified variable.
-    /// </summary>
-    /// <param name="folderPath">The path of the folder containing the files to process.</param>
-    /// <param name="category">The category of the variable to add.</param>
-    /// <param name="variableName">The name of the variable to add.</param>
-    /// <param name="dryRun">If <c>true</c>, simulates the operation without making actual modifications to the files.</param>
-    public void ProcessFolderAddVariable(string folderPath, string category, string variableName, bool dryRun)
+    private string[] GetFiles(string[] targetPaths)
     {
-        if (!Directory.Exists(folderPath))
+        var files = new HashSet<string>();
+        foreach (var path in targetPaths)
         {
-            AnsiConsole.MarkupLine(_loc.GetString("ErrorFolderNotFound", folderPath));
+            if (Directory.Exists(path))
+            {
+                foreach (var file in Directory.GetFiles(path, "*.mrt", SearchOption.AllDirectories))
+                    files.Add(file);
+            }
+            else if (File.Exists(path))
+            {
+                files.Add(path);
+            }
+        }
+        return files.ToArray();
+    }
+
+    /// <summary>
+    /// Processes a variable operation (add, remove, modify) on a list of files or directories.
+    /// </summary>
+    public void ProcessVariableOperation(string[] targetPaths, string action, string category, string variableName, string? newName, string? type, string? initMethod, bool dryRun)
+    {
+        var files = GetFiles(targetPaths);
+        if (files.Length == 0)
+        {
+            AnsiConsole.MarkupLine(_loc.GetString("ErrorFileNotFound", string.Join(", ", targetPaths)));
             return;
         }
 
-        var files = Directory.GetFiles(folderPath, "*.mrt", SearchOption.AllDirectories);
         AnsiConsole.MarkupLine(_loc.GetString("FilesFound", files.Length));
 
         if (dryRun)
@@ -51,7 +65,7 @@ public class BatchProcessingService
             AnsiConsole.MarkupLine(_loc.GetString("DryRunActive"));
             foreach (var file in files)
             {
-                AnsiConsole.MarkupLine(_loc.GetString("DryRunAddVar", variableName, Path.GetFileName(file)));
+                AnsiConsole.MarkupLine($"[yellow]DryRun:[/] {action} var '{variableName}' in {Path.GetFileName(file)}");
             }
             return;
         }
@@ -60,8 +74,147 @@ public class BatchProcessingService
         {
             foreach (var file in files)
             {
-                var operation = new AddVariableOperation(_engine, _loc, file, category, variableName);
-                if (_history.Execute(operation))
+                IReversibleOperation? operation = action.ToLowerInvariant() switch
+                {
+                    "add" => new AddVariableOperation(_engine, _loc, file, category, variableName, type ?? "string", initMethod ?? "Value"),
+                    "remove" => new RemoveVariableOperation(_engine, _loc, file, variableName),
+                    "modify" => new ModifyVariableOperation(_engine, _loc, file, variableName, newName, category, type, initMethod),
+                    _ => null
+                };
+
+                if (operation != null && _history.Execute(operation))
+                {
+                    AnsiConsole.MarkupLine(_loc.GetString("Completed", operation.Description));
+                }
+            }
+        });
+
+        AnsiConsole.MarkupLine(_loc.GetString("SuccessProcess"));
+    }
+
+    /// <summary>
+    /// Processes a data source operation on a list of files or directories.
+    /// </summary>
+    public void ProcessDataSourceOperation(string[] targetPaths, string action, string databaseName, string newConnectionString, bool dryRun)
+    {
+        var files = GetFiles(targetPaths);
+        if (files.Length == 0)
+        {
+            AnsiConsole.MarkupLine(_loc.GetString("ErrorFileNotFound", string.Join(", ", targetPaths)));
+            return;
+        }
+
+        AnsiConsole.MarkupLine(_loc.GetString("FilesFound", files.Length));
+
+        if (dryRun)
+        {
+            AnsiConsole.MarkupLine(_loc.GetString("DryRunActive"));
+            foreach (var file in files)
+            {
+                AnsiConsole.MarkupLine($"[yellow]DryRun:[/] {action} datasource '{databaseName}' in {Path.GetFileName(file)}");
+            }
+            return;
+        }
+
+        AnsiConsole.Status().Start(_loc.GetString("BatchProcessing"), context =>
+        {
+            foreach (var file in files)
+            {
+                IReversibleOperation? operation = action.ToLowerInvariant() switch
+                {
+                    "update-conn" => new UpdateConnectionOperation(_engine, _loc, file, databaseName, newConnectionString),
+                    _ => null
+                };
+
+                if (operation != null && _history.Execute(operation))
+                {
+                    AnsiConsole.MarkupLine(_loc.GetString("Completed", operation.Description));
+                }
+            }
+        });
+
+        AnsiConsole.MarkupLine(_loc.GetString("SuccessProcess"));
+    }
+
+    /// <summary>
+    /// Processes a global property operation on a list of files or directories.
+    /// </summary>
+    public void ProcessPropertyOperation(string[] targetPaths, string action, string propertyName, string propertyValue, bool dryRun)
+    {
+        var files = GetFiles(targetPaths);
+        if (files.Length == 0)
+        {
+            AnsiConsole.MarkupLine(_loc.GetString("ErrorFileNotFound", string.Join(", ", targetPaths)));
+            return;
+        }
+
+        AnsiConsole.MarkupLine(_loc.GetString("FilesFound", files.Length));
+
+        if (dryRun)
+        {
+            AnsiConsole.MarkupLine(_loc.GetString("DryRunActive"));
+            foreach (var file in files)
+            {
+                AnsiConsole.MarkupLine($"[yellow]DryRun:[/] {action} property '{propertyName}' in {Path.GetFileName(file)}");
+            }
+            return;
+        }
+
+        AnsiConsole.Status().Start(_loc.GetString("BatchProcessing"), context =>
+        {
+            foreach (var file in files)
+            {
+                IReversibleOperation? operation = action.ToLowerInvariant() switch
+                {
+                    "set" => new UpdatePropertyOperation(_engine, _loc, file, propertyName, propertyValue),
+                    _ => null
+                };
+
+                if (operation != null && _history.Execute(operation))
+                {
+                    AnsiConsole.MarkupLine(_loc.GetString("Completed", operation.Description));
+                }
+            }
+        });
+
+        AnsiConsole.MarkupLine(_loc.GetString("SuccessProcess"));
+    }
+
+    /// <summary>
+    /// Processes a clean operation on a list of files or directories.
+    /// </summary>
+    public void ProcessCleanOperation(string[] targetPaths, string action, bool dryRun)
+    {
+        var files = GetFiles(targetPaths);
+        if (files.Length == 0)
+        {
+            AnsiConsole.MarkupLine(_loc.GetString("ErrorFileNotFound", string.Join(", ", targetPaths)));
+            return;
+        }
+
+        AnsiConsole.MarkupLine(_loc.GetString("FilesFound", files.Length));
+
+        if (dryRun)
+        {
+            AnsiConsole.MarkupLine(_loc.GetString("DryRunActive"));
+            foreach (var file in files)
+            {
+                AnsiConsole.MarkupLine($"[yellow]DryRun:[/] {action} in {Path.GetFileName(file)}");
+            }
+            return;
+        }
+
+        AnsiConsole.Status().Start(_loc.GetString("BatchProcessing"), context =>
+        {
+            foreach (var file in files)
+            {
+                IReversibleOperation? operation = action.ToLowerInvariant() switch
+                {
+                    "vars" => new CleanUnusedVariablesOperation(_engine, _loc, file),
+                    _ => null
+                };
+
+                if (operation != null && _history.Execute(operation))
                 {
                     AnsiConsole.MarkupLine(_loc.GetString("Completed", operation.Description));
                 }

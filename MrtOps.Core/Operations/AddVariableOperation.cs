@@ -13,6 +13,8 @@ public class AddVariableOperation : IReversibleOperation
     private readonly string _filePath;
     private readonly string _category;
     private readonly string _variableName;
+    private readonly string _type;
+    private readonly string _initMethod;
     private readonly string _backupPath;
 
     /// <summary>
@@ -35,21 +37,15 @@ public class AddVariableOperation : IReversibleOperation
     /// </summary>
     public string? BackupFilePath => _backupPath;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AddVariableOperation"/> class.
-    /// </summary>
-    /// <param name="engine">The report engine.</param>
-    /// <param name="loc">The localization service.</param>
-    /// <param name="filePath">The path of the report file.</param>
-    /// <param name="category">The category of the variable.</param>
-    /// <param name="variableName">The name of the variable.</param>
-    public AddVariableOperation(IReportEngine engine, ILocalizationService loc, string filePath, string category, string variableName)
+    public AddVariableOperation(IReportEngine engine, ILocalizationService loc, string filePath, string category, string variableName, string type = "string", string initMethod = "Value")
     {
         _engine = engine;
         _loc = loc;
         _filePath = filePath;
         _category = category;
         _variableName = variableName;
+        _type = type;
+        _initMethod = initMethod;
         _backupPath = _filePath + ".bak";
     }
 
@@ -62,7 +58,7 @@ public class AddVariableOperation : IReversibleOperation
         if (!File.Exists(_filePath)) return false;
 
         File.Copy(_filePath, _backupPath, true);
-        _engine.AddVariableToReport(_filePath, _category, _variableName);
+        _engine.AddVariableToReport(_filePath, _category, _variableName, _type, _initMethod);
         return true;
     }
 
