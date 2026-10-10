@@ -1,17 +1,20 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace MrtOps.Core.Interfaces;
 
+/// <summary>
+/// Interface that defines operations for accessing template files.
+/// </summary>
 public interface ITemplateRepository
 {
     /// <summary>
-    /// Restituisce la lista dei nomi dei template disponibili (i nomi dei file .mrt senza estensione).
+    /// Returns the list of available template names (the .mrt file names without extension).
     /// </summary>
     IEnumerable<string> GetAvailableTemplates();
 
     /// <summary>
-    /// Restituisce il percorso fisico completo del file di template .mrt richiesto.
-    /// Lancia un'eccezione se il template non viene trovato.
+    /// Returns the complete physical path of the requested .mrt template file.
+    /// Throws an exception if the template is not found.
     /// </summary>
     string GetTemplateFilePath(string templateName);
 }

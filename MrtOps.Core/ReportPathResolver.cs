@@ -3,8 +3,17 @@ using System.IO;
 
 namespace MrtOps.Core;
 
+/// <summary>
+/// Resolves paths for reports providing a full normalized path and a name for the report.
+/// </summary>
 public static class ReportPathResolver
 {
+    /// <summary>
+    /// Resolves the full path and the effective name of the report starting from an input path and an optional name.
+    /// </summary>
+    /// <param name="inputPath">Input path, can be a folder or a file.</param>
+    /// <param name="reportName">Optional report name.</param>
+    /// <returns>A tuple containing the full path and the effective name of the report.</returns>
     public static (string FullPath, string EffectiveReportName) Resolve(string? inputPath, string? reportName)
     {
         string rawPath = string.IsNullOrWhiteSpace(inputPath) ? ".\\" : inputPath.Trim();

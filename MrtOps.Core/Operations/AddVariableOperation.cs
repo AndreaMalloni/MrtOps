@@ -3,6 +3,9 @@ using MrtOps.Core.Interfaces;
 
 namespace MrtOps.Core.Operations;
 
+/// <summary>
+/// Represents an operation to add a variable to a file.
+/// </summary>
 public class AddVariableOperation : IReversibleOperation
 {
     private readonly IReportEngine _engine;
@@ -14,9 +17,24 @@ public class AddVariableOperation : IReversibleOperation
     private readonly string _initMethod;
     private readonly string _backupPath;
 
+    /// <summary>
+    /// Gets the description of the operation.
+    /// </summary>
     public string Description => _loc.GetString("AddVarDesc", _variableName, Path.GetFileName(_filePath));
+
+    /// <summary>
+    /// Gets the type of the operation.
+    /// </summary>
     public string OperationType => "AddVariable";
+
+    /// <summary>
+    /// Gets the path of the target file.
+    /// </summary>
     public string TargetFilePath => _filePath;
+
+    /// <summary>
+    /// Gets the path of the backup file, if available.
+    /// </summary>
     public string? BackupFilePath => _backupPath;
 
     public AddVariableOperation(IReportEngine engine, ILocalizationService loc, string filePath, string category, string variableName, string type = "string", string initMethod = "Value")
@@ -31,6 +49,10 @@ public class AddVariableOperation : IReversibleOperation
         _backupPath = _filePath + ".bak";
     }
 
+    /// <summary>
+    /// Executes the operation.
+    /// </summary>
+    /// <returns><c>true</c> if the execution was successful; otherwise, <c>false</c>.</returns>
     public bool Execute()
     {
         if (!File.Exists(_filePath)) return false;
@@ -40,6 +62,10 @@ public class AddVariableOperation : IReversibleOperation
         return true;
     }
 
+    /// <summary>
+    /// Undoes the operation, restoring the previous state from the backup.
+    /// </summary>
+    /// <returns><c>true</c> if the undo was successful; otherwise, <c>false</c>.</returns>
     public bool Undo()
     {
         if (File.Exists(_backupPath))

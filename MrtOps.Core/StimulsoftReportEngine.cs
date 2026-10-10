@@ -10,15 +10,27 @@ using Stimulsoft.Report.Units;
 
 namespace MrtOps.Core;
 
+/// <summary>
+/// Processing engine for Stimulsoft reports.
+/// </summary>
 public class StimulsoftReportEngine : IReportEngine
 {
     private readonly ILogger<StimulsoftReportEngine>? _logger;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="StimulsoftReportEngine"/>.
+    /// </summary>
+    /// <param name="logger">Optional logger to log operations.</param>
     public StimulsoftReportEngine(ILogger<StimulsoftReportEngine>? logger = null)
     {
         _logger = logger;
     }
 
+    /// <summary>
+    /// Generates a new report from the provided metadata and template.
+    /// </summary>
+    /// <param name="metadata">The metadata of the report to generate.</param>
+    /// <param name="template">The template definition to use.</param>
     public void GenerateReport(ReportMetadata metadata, ReportTemplateDef template)
     {
         var report = new StiReport
@@ -272,6 +284,11 @@ public class StimulsoftReportEngine : IReportEngine
         }
     }
 
+    /// <summary>
+    /// Applies a specific style to a report.
+    /// </summary>
+    /// <param name="reportPath">The path of the report file.</param>
+    /// <param name="styleFilePath">The path of the style file to apply.</param>
     public void ApplyStyleToReport(string reportPath, string styleFilePath)
     {
         var report = new StiReport();
@@ -281,6 +298,11 @@ public class StimulsoftReportEngine : IReportEngine
         report.Save(reportPath);
     }
 
+    /// <summary>
+    /// Synchronizes globalization strings within a report.
+    /// </summary>
+    /// <param name="reportPath">The path of the report file.</param>
+    /// <param name="localizedStrings">The dictionary of localized strings to synchronize.</param>
     public void SyncGlobalizationStrings(string reportPath, Dictionary<string, Dictionary<string, string>> localizedStrings)
     {
         var report = new StiReport();
@@ -305,6 +327,12 @@ public class StimulsoftReportEngine : IReportEngine
         report.Save(reportPath);
     }
 
+    /// <summary>
+    /// Updates the metadata of an existing report.
+    /// </summary>
+    /// <param name="reportPath">The path of the report file.</param>
+    /// <param name="metadata">The new metadata to apply.</param>
+    /// <returns><c>true</c> if the update was successful, <c>false</c> otherwise.</returns>
     public bool UpdateReportMetadata(string reportPath, ReportMetadata metadata)
     {
         try
@@ -332,6 +360,11 @@ public class StimulsoftReportEngine : IReportEngine
         }
     }
 
+    /// <summary>
+    /// Creates a new empty report.
+    /// </summary>
+    /// <param name="outputPath">The output path where to save the report.</param>
+    /// <returns><c>true</c> if the creation was successful, <c>false</c> otherwise.</returns>
     public bool CreateEmptyReport(string outputPath)
     {
         try

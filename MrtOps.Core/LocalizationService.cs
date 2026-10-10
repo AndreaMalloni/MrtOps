@@ -4,16 +4,28 @@ using MrtOps.Core.Interfaces;
 
 namespace MrtOps.Core;
 
+/// <summary>
+/// Service for managing localization of strings in the application.
+/// </summary>
 public class LocalizationService : ILocalizationService
 {
     private readonly Dictionary<string, string> _strings;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="LocalizationService"/> loading strings in the appropriate language.
+    /// </summary>
     public LocalizationService()
     {
         var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
         _strings = culture == "it" ? GetItalianStrings() : GetEnglishStrings();
     }
 
+    /// <summary>
+    /// Gets the localized string formatted with the provided arguments for the specified key.
+    /// </summary>
+    /// <param name="key">The key of the string to retrieve.</param>
+    /// <param name="args">Optional arguments for string formatting.</param>
+    /// <returns>The localized formatted string.</returns>
     public string GetString(string key, params object[] args)
     {
         if (!_strings.TryGetValue(key, out var value))

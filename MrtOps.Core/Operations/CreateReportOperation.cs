@@ -6,6 +6,9 @@ using MrtOps.Core.Models;
 
 namespace MrtOps.Core.Operations;
 
+/// <summary>
+/// Represents an operation for creating a report.
+/// </summary>
 public class CreateReportOperation : IReversibleOperation
 {
     private readonly IReportEngine _engine;
@@ -14,11 +17,34 @@ public class CreateReportOperation : IReversibleOperation
     private readonly ReportMetadata _metadata;
     private readonly ILogger<CreateReportOperation> _logger;
 
+    /// <summary>
+    /// Gets the description of the operation.
+    /// </summary>
     public string Description => _loc.GetString("OpCreateReport", _metadata.Name, _metadata.TemplateName);
+
+    /// <summary>
+    /// Gets the type of the operation.
+    /// </summary>
     public string OperationType => "CreateReport";
+
+    /// <summary>
+    /// Gets the path of the target file.
+    /// </summary>
     public string TargetFilePath => _metadata.OutputPath;
+
+    /// <summary>
+    /// Gets the path of the backup file, if available.
+    /// </summary>
     public string? BackupFilePath => null;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateReportOperation"/> class.
+    /// </summary>
+    /// <param name="engine">The report engine.</param>
+    /// <param name="loc">The localization service.</param>
+    /// <param name="templateRepo">The template repository.</param>
+    /// <param name="metadata">The report metadata.</param>
+    /// <param name="logger">The logger.</param>
     public CreateReportOperation(
         IReportEngine engine,
         ILocalizationService loc,
@@ -33,6 +59,10 @@ public class CreateReportOperation : IReversibleOperation
         _logger = logger;
     }
 
+    /// <summary>
+    /// Executes the operation.
+    /// </summary>
+    /// <returns><c>true</c> if the execution was successful; otherwise, <c>false</c>.</returns>
     public bool Execute()
     {
         try
@@ -90,6 +120,10 @@ public class CreateReportOperation : IReversibleOperation
         }
     }
 
+    /// <summary>
+    /// Undoes the operation, removing the created report.
+    /// </summary>
+    /// <returns><c>true</c> if the undo was successful; otherwise, <c>false</c>.</returns>
     public bool Undo()
     {
         try

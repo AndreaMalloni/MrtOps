@@ -2,8 +2,16 @@ using MrtOps.Core.Models;
 
 namespace MrtOps.Core.Interfaces;
 
+/// <summary>
+/// Interface for the report generation engine.
+/// </summary>
 public interface IReportEngine
 {
+    /// <summary>
+    /// Generates a report.
+    /// </summary>
+    /// <param name="metadata">The report metadata.</param>
+    /// <param name="template">The report template definition.</param>
     void GenerateReport(ReportMetadata metadata, ReportTemplateDef template);
     /// <summary>
     /// Adds a new variable to the specified report.
@@ -56,7 +64,26 @@ public interface IReportEngine
     void CleanUnusedVariables(string filePath);
 
     void ApplyStyleToReport(string reportPath, string styleFilePath);
+
+    /// <summary>
+    /// Synchronizes the report globalization strings.
+    /// </summary>
+    /// <param name="reportPath">The report path.</param>
+    /// <param name="localizedStrings">A dictionary containing the localized strings.</param>
     void SyncGlobalizationStrings(string reportPath, Dictionary<string, Dictionary<string, string>> localizedStrings);
+
+    /// <summary>
+    /// Updates the metadata of a report.
+    /// </summary>
+    /// <param name="reportPath">The report path.</param>
+    /// <param name="metadata">The new report metadata.</param>
+    /// <returns>True if the update was successful, otherwise false.</returns>
     bool UpdateReportMetadata(string reportPath, ReportMetadata metadata);
+
+    /// <summary>
+    /// Creates an empty report.
+    /// </summary>
+    /// <param name="outputPath">The output path of the report.</param>
+    /// <returns>True if creation was successful, otherwise false.</returns>
     bool CreateEmptyReport(string outputPath);
 }
