@@ -66,7 +66,15 @@ public class Program
                 app.Configure(config =>
                 {
                     config.AddCommand<GenerateCommand>("gen");
-                    config.AddCommand<BatchCommand>("batch");
+                    
+                    config.AddBranch("batch", batch =>
+                    {
+                        batch.AddCommand<BatchVarCommand>("var");
+                        batch.AddCommand<BatchDsCommand>("ds");
+                        batch.AddCommand<BatchPropCommand>("prop");
+                        batch.AddCommand<BatchCleanCommand>("clean");
+                    });
+
                     config.AddCommand<DbScanCommand>("db-scan");
                     config.AddCommand<SyncStyleCommand>("sync-style");
                     config.AddCommand<SyncStringsCommand>("sync-strings");

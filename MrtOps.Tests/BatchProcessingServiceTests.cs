@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using MrtOps.Core;
 using MrtOps.Core.Interfaces;
 using Xunit;
@@ -38,16 +38,38 @@ public class BatchProcessingServiceTests : IDisposable
     }
 
     [Fact]
-    public void ProcessFolderAddVariable_ShouldProcessAllFiles_WhenDryRunIsFalse()
+    public void ProcessVariableOperation_Add_ShouldProcessAllFiles_WhenDryRunIsFalse()
     {
-        _service.ProcessFolderAddVariable(_testDir, "Cat", "Var", false);
-        _engineMock.Verify(e => e.AddVariableToReport(It.IsAny<string>(), "Cat", "Var"), Times.Exactly(2));
+        _service.ProcessVariableOperation(new[] { _testDir }, "add", "Cat", "Var", null, "string", "Value", false);
+        _engineMock.Verify(e => e.AddVariableToReport(It.IsAny<string>(), "Cat", "Var", "string", "Value"), Times.Exactly(2));
     }
 
     [Fact]
-    public void ProcessFolderAddVariable_ShouldNotCallEngine_WhenDryRunIsTrue()
+    public void ProcessVariableOperation_Add_ShouldNotCallEngine_WhenDryRunIsTrue()
     {
-        _service.ProcessFolderAddVariable(_testDir, "Cat", "Var", true);
-        _engineMock.Verify(e => e.AddVariableToReport(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _service.ProcessVariableOperation(new[] { _testDir }, "add", "Cat", "Var", null, "string", "Value", true);
+        _engineMock.Verify(e => e.AddVariableToReport(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public void ProcessVariableOperation_Remove_ShouldCallEngine()
+    {
+        _service.ProcessVariableOperation(new[] { _testDir }, "remove", "Cat", "Var", null, null, null, false);
+        _engineMock.Verify(e => e.RemoveVariableFromReport(It.IsAny<string>(), "Var"), Times.Exactly(2));
+    }
+
+    [Fact]
+    public void ProcessVariableOperation_Modify_ShouldCallEngine()
+    {
+        _service.ProcessVariableOperation(new[] { _testDir }, "modify", "Cat", "Var", "NewVar", "int", "Expression", false);
+        _engineMock.Verify(e => e.ModifyVariableInReport(It.IsAny<string>(), "Var", "NewVar", "Cat", "int", "Expression"), Times.Exactly(2));
+    }
+
+    [Fact]
+    public void ProcessVariableOperation_SingleFile_ShouldProcessOnlyOneFile()
+    {
+        var singleFile = Path.Combine(_testDir, "file1.mrt");
+        _service.ProcessVariableOperation(new[] { singleFile }, "add", "Cat", "Var", null, "string", "Value", false);
+        _engineMock.Verify(e => e.AddVariableToReport(singleFile, "Cat", "Var", "string", "Value"), Times.Once);
     }
 }

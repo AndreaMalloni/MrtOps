@@ -69,7 +69,10 @@ public class LocalizationService : ILocalizationService
         { "TestApplyStyle", "Style applied successfully" },
         { "TestSyncStrings", "Localized strings synchronized successfully" },
         { "TestDatabaseConnection", "Database connection verified" },
-        { "TestUndoOperation", "Operation reverted successfully" }
+        { "TestUndoOperation", "Operation reverted successfully" },
+        { "UpdateConnDesc", "Updated connection for '{0}' in report '{1}'" },
+        { "UpdatePropDesc", "Updated property '{0}' in report '{1}'" },
+        { "CleanUnusedVarsDesc", "Cleaned unused variables in report '{0}'" }
     };
 
     private Dictionary<string, string> GetItalianStrings() => new()
@@ -118,6 +121,9 @@ public class LocalizationService : ILocalizationService
         { "TestApplyStyle", "Stile applicato con successo" },
         { "TestSyncStrings", "Stringhe geolocalizzate sincronizzate con successo" },
         { "TestDatabaseConnection", "Connessione al database verificata" },
-        { "TestUndoOperation", "Operazione annullata con successo" }
+        { "TestUndoOperation", "Operazione annullata con successo" },
+        { "UpdateConnDesc", "Aggiornata connessione per '{0}' nel report '{1}'" },
+        { "UpdatePropDesc", "Aggiornata proprietà '{0}' nel report '{1}'" },
+        { "CleanUnusedVarsDesc", "Pulite variabili non utilizzate nel report '{0}'" }
     };
 }

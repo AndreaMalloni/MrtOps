@@ -10,6 +10,8 @@ public class AddVariableOperation : IReversibleOperation
     private readonly string _filePath;
     private readonly string _category;
     private readonly string _variableName;
+    private readonly string _type;
+    private readonly string _initMethod;
     private readonly string _backupPath;
 
     public string Description => _loc.GetString("AddVarDesc", _variableName, Path.GetFileName(_filePath));
@@ -17,13 +19,15 @@ public class AddVariableOperation : IReversibleOperation
     public string TargetFilePath => _filePath;
     public string? BackupFilePath => _backupPath;
 
-    public AddVariableOperation(IReportEngine engine, ILocalizationService loc, string filePath, string category, string variableName)
+    public AddVariableOperation(IReportEngine engine, ILocalizationService loc, string filePath, string category, string variableName, string type = "string", string initMethod = "Value")
     {
         _engine = engine;
         _loc = loc;
         _filePath = filePath;
         _category = category;
         _variableName = variableName;
+        _type = type;
+        _initMethod = initMethod;
         _backupPath = _filePath + ".bak";
     }
 
@@ -32,7 +36,7 @@ public class AddVariableOperation : IReversibleOperation
         if (!File.Exists(_filePath)) return false;
 
         File.Copy(_filePath, _backupPath, true);
-        _engine.AddVariableToReport(_filePath, _category, _variableName);
+        _engine.AddVariableToReport(_filePath, _category, _variableName, _type, _initMethod);
         return true;
     }
 

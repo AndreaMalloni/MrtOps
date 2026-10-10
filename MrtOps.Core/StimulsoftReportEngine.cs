@@ -34,11 +34,6 @@ public class StimulsoftReportEngine : IReportEngine
 
         report.Dictionary.Synchronize();
 
-        foreach (var category in template.Categories)
-        {
-            report.Dictionary.Variables.Add(new StiVariable(category, category));
-        }
-
         foreach (var variable in template.DefaultVariables)
         {
             string targetCategory = template.Categories.Count > 0 ? template.Categories[0] : string.Empty;
@@ -48,20 +43,231 @@ public class StimulsoftReportEngine : IReportEngine
         report.Save(metadata.OutputPath);
     }
 
-    public void AddVariableToReport(string filePath, string category, string variableName)
+    private Type GetTypeFromString(string type)
+    {
+        return type.ToLowerInvariant() switch
+        {
+            "int" => typeof(int),
+            "decimal" => typeof(decimal),
+            "bool" => typeof(bool),
+            "datetime" => typeof(DateTime),
+            _ => typeof(string)
+        };
+    }
+
+    private StiVariableInitBy GetInitByFromString(string initMethod)
+    {
+        if (Enum.TryParse<StiVariableInitBy>(initMethod, true, out var result))
+            return result;
+        return StiVariableInitBy.Value;
+    }
+
+    public void AddVariableToReport(string filePath, string category, string variableName, string type = "string", string initMethod = "Value")
     {
         var report = new StiReport();
         report.Load(filePath);
         report.Dictionary.Synchronize();
 
-        if (report.Dictionary.Variables[category] == null)
-        {
-            report.Dictionary.Variables.Add(new StiVariable(category, category));
-        }
-
         if (report.Dictionary.Variables[variableName] == null)
         {
-            report.Dictionary.Variables.Add(new StiVariable(category, variableName, typeof(string), string.Empty, true));
+            var newVar = new StiVariable(category, variableName, GetTypeFromString(type), string.Empty, true);
+            newVar.InitBy = GetInitByFromString(initMethod);
+            report.Dictionary.Variables.Add(newVar);
+            report.Save(filePath);
+        }
+    }
+
+    public void RemoveVariableFromReport(string filePath, string variableName)
+    {
+        var report = new StiReport();
+        report.Load(filePath);
+        report.Dictionary.Synchronize();
+
+        var variable = report.Dictionary.Variables[variableName];
+        if (variable != null)
+        {
+            report.Dictionary.Variables.Remove(variable);
+            report.Save(filePath);
+        }
+    }
+
+    public void ModifyVariableInReport(string filePath, string variableName, string? newName = null, string? newCategory = null, string? type = null, string? initMethod = null)
+    {
+        var report = new StiReport();
+        report.Load(filePath);
+        report.Dictionary.Synchronize();
+
+        var variable = report.Dictionary.Variables[variableName];
+        if (variable != null)
+        {
+            bool modified = false;
+            
+            if (!string.IsNullOrEmpty(newCategory) && variable.Category != newCategory)
+            {
+                variable.Category = newCategory;
+                modified = true;
+            }
+
+            if (!string.IsNullOrEmpty(newName) && variable.Name != newName)
+            {
+                variable.Name = newName;
+                variable.Alias = newName;
+                modified = true;
+            }
+
+            if (!string.IsNullOrEmpty(type))
+            {
+                var newType = GetTypeFromString(type);
+                if (variable.Type != newType)
+                {
+                    variable.Type = newType;
+                    modified = true;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(initMethod))
+            {
+                var newInitBy = GetInitByFromString(initMethod);
+                if (variable.InitBy != newInitBy)
+                {
+                    variable.InitBy = newInitBy;
+                    modified = true;
+                }
+            }
+
+            if (modified)
+            {
+                report.Save(filePath);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates a global property of the report.
+    /// </summary>
+    public void UpdateReportProperty(string filePath, string propertyName, string propertyValue)
+    {
+        var report = new StiReport();
+        report.Load(filePath);
+        
+        bool modified = false;
+
+        switch (propertyName.ToLowerInvariant())
+        {
+            case "author":
+                if (report.ReportAuthor != propertyValue)
+                {
+                    report.ReportAuthor = propertyValue;
+                    modified = true;
+                }
+                break;
+            case "description":
+                if (report.ReportDescription != propertyValue)
+                {
+                    report.ReportDescription = propertyValue;
+                    modified = true;
+                }
+                break;
+            case "alias":
+                if (report.ReportAlias != propertyValue)
+                {
+                    report.ReportAlias = propertyValue;
+                    modified = true;
+                }
+                break;
+            case "convertnulls":
+                if (bool.TryParse(propertyValue, out bool bVal) && report.ConvertNulls != bVal)
+                {
+                    report.ConvertNulls = bVal;
+                    modified = true;
+                }
+                break;
+            case "culture":
+                if (report.Culture != propertyValue)
+                {
+                    report.Culture = propertyValue;
+                    modified = true;
+                }
+                break;
+        }
+
+        if (modified)
+        {
+            report.Save(filePath);
+        }
+    }
+
+    /// <summary>
+    /// Updates the connection string of a database in the report.
+    /// </summary>
+    public void UpdateDataSourceConnection(string filePath, string databaseName, string newConnectionString)
+    {
+        var report = new StiReport();
+        report.Load(filePath);
+        report.Dictionary.Synchronize();
+
+        bool modified = false;
+        var db = report.Dictionary.Databases[databaseName];
+        if (db != null)
+        {
+            var propInfo = db.GetType().GetProperty("ConnectionString");
+            if (propInfo != null && propInfo.CanWrite)
+            {
+                var currentConnectionString = propInfo.GetValue(db) as string;
+                if (currentConnectionString != newConnectionString)
+                {
+                    propInfo.SetValue(db, newConnectionString);
+                    modified = true;
+                }
+            }
+        }
+
+        if (modified)
+        {
+            report.Save(filePath);
+        }
+    }
+
+    /// <summary>
+    /// Removes unused variables from the report by checking if their names appear anywhere else in the report source.
+    /// </summary>
+    public void CleanUnusedVariables(string filePath)
+    {
+        var report = new StiReport();
+        report.Load(filePath);
+        report.Dictionary.Synchronize();
+        
+        // A simple heuristic for batch cleaning: check if the variable's name appears 
+        // in the report's saved string representation more times than just its definition.
+        string reportContent = report.SaveToString();
+        var variablesToRemove = new List<StiVariable>();
+
+        foreach (StiVariable variable in report.Dictionary.Variables)
+        {
+            // Not a foolproof AST check, but a safe heuristic for batch operations
+            // Count occurrences of the variable name in the raw report string.
+            // If it's used in expressions, it will appear multiple times.
+            int count = 0;
+            int i = 0;
+            while ((i = reportContent.IndexOf(variable.Name, i, StringComparison.InvariantCulture)) != -1)
+            {
+                count++;
+                i += variable.Name.Length;
+            }
+
+            // Usually defined at least once in the dictionary. If it appears only once, it might be unused.
+            if (count <= 1)
+            {
+                variablesToRemove.Add(variable);
+            }
+        }
+
+        if (variablesToRemove.Count > 0)
+        {
+            foreach (var v in variablesToRemove)
+            {
+                report.Dictionary.Variables.Remove(v);
+            }
             report.Save(filePath);
         }
     }
